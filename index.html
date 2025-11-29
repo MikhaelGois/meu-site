@@ -1,70 +1,63 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+﻿<!DOCTYPE html>
+<html lang=" pt-br\>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Portfolio</title>
-    <link rel="stylesheet" href="./styles/style.css">
+ <meta charset=\UTF-8\>
+ <meta name=\viewport\ content=\width=device-width initial-scale=1.0\>
+ <title>Site Portfolio</title>
+ <link rel=\stylesheet\ href=\./styles/style.css\>
 </head>
 <body>
-    <header class="cabecalho">
-        <div class="container">
-            <button class="menu-toggle" aria-label="Toggle menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="cabecalho_menu">
-                <a class="cabecalho_menu_link" href="./index.html">Home</a>
-                <a class="cabecalho_menu_link" href="./about.html">Sobre Mim</a>
-                <a class="cabecalho_menu_link" href="./portfolio.html">Meus Projetos</a>
-                <a class="cabecalho_menu_link" href="./contato.html">Contato</a>
-            </nav>
-        </div>
-    </header>
-    <main class="container">
-        <section class="apresentacao">
-            <section class="apresentacao_conteudo">
-                <h1 class="apresentacao_conteudo_titulo">Eleve seu negócio digital a outro nível <strong class="destaqueazul">com um Front-end de qualidade! </strong></h1>
-                <p class="apresentacao_conteudo_texto">Olá! Sou Mikhael Gois, desenvolvedor Front-end com especialidade em <strong>React, HTML e CSS.</strong> Ajudo pequenos negócios e designers a colocarem em prática boas ideias. Vamos conversar?</p>
-                <div class="apresentacao_links">            
-                    <a class="apresentacao_links_link" href="https://instagram.com/mikhael.lucas" target="_blank"><img src="./assets/instagram.png" alt="instagram">
-                        Instagram</a>
-                    <a class="apresentacao_links_link" href="https://www.linkedin.com/in/mikhael-gois-5661bb128/" target="_blank"><img src="./assets/linkedin.png" alt="LinkedIn">
-                        LinkedIn</a>
-                    <a class="apresentacao_links_link" href="https://github.com/MikhaelGois" target="_blank"><img src="./assets/github.png" alt="github">
-                        GitHub</a>
-                </div>
-            </section>
-            <img src="./assets/perfil-edit.png" alt="Foto de Mikhael Gois" class="image_profile">
-        </section>
-    </main>
-    <footer>
-        <p class="rodape">
-            © 2025 Desenvolvido por Mikhael Gois. Todos os direitos reservados.
-        </p>
-        <p class="rodape-versiculo">
-            "E tudo quanto fizerdes, fazei-o de todo o coração, como para o Senhor." - Colossenses 3:23
-        </p>
-    </footer>
-    
-    <script src="./scripts/main.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+ <header class=\cabecalho\>
+ <div class=\container\>
+ <button class=\menu-toggle\ aria-label=\Toggle menu\>
+ <span></span>
+ <span></span>
+ <span></span>
+ </button>
+ <nav class=\cabecalho_menu\>
+ <a class=\cabecalho_menu_link\ href=\./index.html\>Home</a>
+ <a class=\cabecalho_menu_link\ href=\./about.html\>Sobre Mim</a>
+ <a class=\cabecalho_menu_link\ href=\./portfolio.html\>Meus Projetos</a>
+ <a class=\cabecalho_menu_link\ href=\./contato.html\>Contato</a>
+ </nav>
+ </div>
+ </header>
+ <main class=\container\>
+ <section class=\apresentacao\>
+ <section class=\apresentacao_conteudo\>
+ <h1 class=\apresentacao_conteudo_titulo\>Eleve seu negócio digital a outro nível <strong class=\destaqueazul\>com um Front-end de qualidade! </strong></h1>
+ <p class=\apresentacao_conteudo_texto\>Olá! Sou Mikhael Gois, desenvolvedor Front-end com especialidade em <strong>React, HTML e CSS.</strong> Ajudo pequenos negócios e designers a colocarem em prática boas ideias. Vamos conversar?</p>
+ <div class=\apresentacao_links\> 
+ <a class=\apresentacao_links_link\ href=\https://instagram.com/mikhael.lucas\ target=\_blank\><img src=\./assets/instagram.png\ alt=\instagram\>Instagram</a>
+ <a class=\apresentacao_links_link\ href=\https://www.linkedin.com/in/mikhael-gois-5661bb128/\ target=\_blank\><img src=\./assets/linkedin.png\ alt=\LinkedIn\>LinkedIn</a>
+ <a class=\apresentacao_links_link\ href=\https://github.com/MikhaelGois\ target=\_blank\><img src=\./assets/github.png\ alt=\github\>GitHub</a>
+ </div>
+ </section>
+ <img src=\./assets/perfil-edit.png\ alt=\Foto de Mikhael Gois\ class=\image_profile\>
+ </section>
+ </main>
+ <footer>
+ <p class=\rodape\> 2025 Desenvolvido por Mikhael Gois. Todos os direitos reservados.</p>
+ <p class=\rodape-versiculo\>\E tudo quanto fizerdes fazei-o de todo o coração como para o Senhor.\ - Colossenses 3:23</p>
+ </footer>
+ 
+ <script src=\./scripts/main.js\></script>
+ <script type=\module\>
+ import { initializeApp } from \https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js\;
+ import { getAnalytics } from \https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js\;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyABsOA8HHB85jzqGZbMo-TjgIOIhkTSO8U",
-            authDomain: "portfoliomikhael.firebaseapp.com",
-            projectId: "portfoliomikhael",
-            storageBucket: "portfoliomikhael.firebasestorage.app",
-            messagingSenderId: "1049663543052",
-            appId: "1:1049663543052:web:d158c279459a3e50321b29",
-            measurementId: "G-RC453602G0"
-        };
+ const firebaseConfig = {
+ apiKey: \AIzaSyABsOA8HHB85jzqGZbMo-TjgIOIhkTSO8U\,
+ authDomain: \portfoliomikhael.firebaseapp.com\,
+ projectId: \portfoliomikhael\,
+ storageBucket: \portfoliomikhael.firebasestorage.app\,
+ messagingSenderId: \1049663543052\,
+ appId: \1:1049663543052:web:d158c279459a3e50321b29\,
+ measurementId: \G-RC453602G0\
+ };
 
-        const app = initializeApp(firebaseConfig);
-        getAnalytics(app);
-    </script>
+ const app = initializeApp(firebaseConfig);
+ getAnalytics(app);
+ </script>
 </body>
 </html>
