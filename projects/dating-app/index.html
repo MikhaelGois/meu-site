@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Relacionamento</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        h1 {
+            margin: 0;
+            color: #fff;
+        }
+        .cards-container {
+            position: relative;
+            height: 600px;
+            padding: 20px;
+        }
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.3s;
+        }
+        .card.swiping {
+            transition: none;
+        }
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+        }
+        .profile-info h2 {
+            margin: 10px 0;
+        }
+        .profile-bio {
+            opacity: 0.8;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .actions {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 2rem;
+            transition: transform 0.2s;
+        }
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        .dislike {
+            background: #ff6b6b;
+        }
+        .like {
+            background: #51cf66;
+        }
+        .back-btn {
+            background: #667eea;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+        .match-message {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            font-size: 4rem;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💖 Dating App</h1>
+        </div>
+
+        <div class="cards-container" id="cardsContainer">
+            <div class="card" id="currentCard">
+                <div class="profile-image" id="profileImage">👤</div>
+                <div class="profile-info">
+                    <h2 id="profileName"></h2>
+                    <p id="profileAge"></p>
+                    <p class="profile-bio" id="profileBio"></p>
+                    <div class="tags" id="profileTags"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="action-btn dislike" onclick="swipe('left')">✖</button>
+            <button class="action-btn like" onclick="swipe('right')">❤</button>
+        </div>
+    </div>
+
+    <div class="match-message" id="matchMessage">
+        ✨ É um Match! ✨
+    </div>
+
+    <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+
+    <script>
+        const profiles = [
+            {
+                name: 'Ana Silva',
+                age: 25,
+                icon: '👩',
+                bio: 'Amante de viagens e fotografia. Adora café e conversas profundas.',
+                tags: ['Viagens', 'Fotografia', 'Café']
+            },
+            {
+                name: 'Carlos Santos',
+                age: 28,
+                icon: '👨',
+                bio: 'Desenvolvedor apaixonado por tecnologia e música. Guitarrista nas horas vagas.',
+                tags: ['Tecnologia', 'Música', 'Games']
+            },
+            {
+                name: 'Julia Costa',
+                age: 26,
+                icon: '👩‍🦰',
+                bio: 'Designer criativa que adora arte e natureza. Praticante de yoga.',
+                tags: ['Design', 'Arte', 'Yoga']
+            },
+            {
+                name: 'Pedro Alves',
+                age: 30,
+                icon: '👨‍🦱',
+                bio: 'Chef de cozinha que ama experimentar novos sabores e culturas.',
+                tags: ['Culinária', 'Viagens', 'Vinhos']
+            },
+            {
+                name: 'Mariana Lima',
+                age: 24,
+                icon: '👩‍🦱',
+                bio: 'Atleta e personal trainer. Vida saudável e aventuras ao ar livre.',
+                tags: ['Fitness', 'Natureza', 'Esportes']
+            }
+        ];
+
+        let currentIndex = 0;
+
+        function showProfile() {
+            if (currentIndex >= profiles.length) {
+                document.getElementById('currentCard').innerHTML = '<h2 style="margin-top: 200px;">Sem mais perfis no momento!</h2>';
+                return;
+            }
+
+            const profile = profiles[currentIndex];
+            document.getElementById('profileImage').textContent = profile.icon;
+            document.getElementById('profileName').textContent = profile.name;
+            document.getElementById('profileAge').textContent = `${profile.age} anos`;
+            document.getElementById('profileBio').textContent = profile.bio;
+            document.getElementById('profileTags').innerHTML = profile.tags.map(tag => 
+                `<span class="tag">${tag}</span>`
+            ).join('');
+        }
+
+        function swipe(direction) {
+            const card = document.getElementById('currentCard');
+            card.style.transition = 'transform 0.5s, opacity 0.5s';
+            card.style.transform = `translateX(${direction === 'right' ? '500px' : '-500px'}) rotate(${direction === 'right' ? '20deg' : '-20deg'})`;
+            card.style.opacity = '0';
+
+            if (direction === 'right' && Math.random() > 0.5) {
+                setTimeout(() => {
+                    const matchMsg = document.getElementById('matchMessage');
+                    matchMsg.style.display = 'flex';
+                    setTimeout(() => {
+                        matchMsg.style.display = 'none';
+                    }, 2000);
+                }, 500);
+            }
+
+            setTimeout(() => {
+                currentIndex++;
+                card.style.transition = 'none';
+                card.style.transform = '';
+                card.style.opacity = '1';
+                showProfile();
+            }, 500);
+        }
+
+        showProfile();
+    </script>
+</body>
+</html>

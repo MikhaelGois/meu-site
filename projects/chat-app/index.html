@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        .message.sent {
+            align-self: flex-end;
+            background: #667eea;
+            color: white;
+        }
+        .message.received {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .message-info {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        .input-area {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        button {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #f093fb;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 Chat App</h1>
+            <p>Simulador de Chat</p>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+    <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+
+    <script>
+        let messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+
+        function renderMessages() {
+            const container = document.getElementById('messages');
+            container.innerHTML = messages.map(msg => `
+                <div class="message ${msg.type}">
+                    <div>${msg.text}</div>
+                    <div class="message-info">${msg.time}</div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            messages.push({ text, type: 'sent', time: now });
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+            renderMessages();
+            input.value = '';
+
+            // Simulate response
+            setTimeout(() => {
+                const responses = [
+                    'Interessante!',
+                    'Entendo.',
+                    'Conte-me mais sobre isso.',
+                    'Legal!',
+                    'Que bacana!'
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                messages.push({ text: response, type: 'received', time: now });
+                localStorage.setItem('chatMessages', JSON.stringify(messages));
+                renderMessages();
+            }, 1000);
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        renderMessages();
+    </script>
+</body>
+</html>

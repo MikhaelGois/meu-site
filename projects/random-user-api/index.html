@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Usuário Aleatório</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .user-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+        }
+        .user-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .user-username {
+            opacity: 0.7;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .user-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .info-label {
+            opacity: 0.7;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 1.1rem;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            flex: 1;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .back-btn {
+            background: #f093fb;
+        }
+        .back-btn:hover {
+            background: #d875e0;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 Gerador de Usuário Aleatório</h1>
+
+        <div class="user-card" id="userCard">
+            <div class="loading">⏳</div>
+        </div>
+
+        <div class="buttons">
+            <button onclick="generateUser()">🔄 Gerar Novo</button>
+            <a href="../../index.html#portfolio" style="flex: 1;"><button class="back-btn">Voltar</button></a>
+        </div>
+    </div>
+
+    <script>
+        const avatars = ['👨', '👩', '🧑', '👨‍💼', '👩‍💼', '👨‍🎓', '👩‍🎓', '👨‍🔬', '👩‍🔬', '👨‍🎨', '👩‍🎨'];
+
+        async function generateUser() {
+            document.getElementById('userCard').innerHTML = '<div class="loading">⏳</div>';
+
+            try {
+                const response = await fetch('https://randomuser.me/api/');
+                const data = await response.json();
+                const user = data.results[0];
+
+                displayUser(user);
+            } catch (error) {
+                console.error('Error:', error);
+                generateFakeUser();
+            }
+        }
+
+        function displayUser(user) {
+            const card = document.getElementById('userCard');
+            const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+            
+            card.innerHTML = `
+                <div class="avatar">${avatar}</div>
+                <div class="user-name">${user.name.first} ${user.name.last}</div>
+                <div class="user-username">@${user.login.username}</div>
+                
+                <div class="user-info">
+                    <div class="info-item">
+                        <div class="info-label">📧 Email</div>
+                        <div class="info-value">${user.email}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">📱 Telefone</div>
+                        <div class="info-value">${user.phone}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">🌍 País</div>
+                        <div class="info-value">${user.location.country}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">🏙️ Cidade</div>
+                        <div class="info-value">${user.location.city}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">🎂 Idade</div>
+                        <div class="info-value">${user.dob.age} anos</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">📅 Data de Nascimento</div>
+                        <div class="info-value">${new Date(user.dob.date).toLocaleDateString('pt-BR')}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateFakeUser() {
+            const firstNames = ['João', 'Maria', 'Pedro', 'Ana', 'Carlos', 'Julia', 'Fernando', 'Beatriz'];
+            const lastNames = ['Silva', 'Santos', 'Oliveira', 'Souza', 'Costa', 'Lima', 'Pereira', 'Alves'];
+            const cities = ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Brasília', 'Salvador', 'Curitiba'];
+            
+            const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+            const age = Math.floor(Math.random() * 50) + 18;
+            const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+
+            const card = document.getElementById('userCard');
+            card.innerHTML = `
+                <div class="avatar">${avatar}</div>
+                <div class="user-name">${firstName} ${lastName}</div>
+                <div class="user-username">@${firstName.toLowerCase()}${Math.floor(Math.random() * 9999)}</div>
+                
+                <div class="user-info">
+                    <div class="info-item">
+                        <div class="info-label">📧 Email</div>
+                        <div class="info-value">${firstName.toLowerCase()}.${lastName.toLowerCase()}@email.com</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">📱 Telefone</div>
+                        <div class="info-value">(11) 9${Math.floor(Math.random() * 90000000) + 10000000}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">🌍 País</div>
+                        <div class="info-value">Brasil</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">🏙️ Cidade</div>
+                        <div class="info-value">${cities[Math.floor(Math.random() * cities.length)]}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">🎂 Idade</div>
+                        <div class="info-value">${age} anos</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">📅 Data de Nascimento</div>
+                        <div class="info-value">${new Date(2024 - age, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString('pt-BR')}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        generateUser();
+    </script>
+</body>
+</html>

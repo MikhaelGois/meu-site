@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Desenho</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        h1 { text-align: center; color: #fff; }
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover { background: #5568d3; }
+        input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        input[type="range"] {
+            width: 150px;
+        }
+        canvas {
+            background: white;
+            border-radius: 10px;
+            cursor: crosshair;
+            display: block;
+            margin: 0 auto;
+            touch-action: none;
+        }
+        .back-btn {
+            background: #f093fb;
+            margin-top: 20px;
+        }
+        .back-btn:hover { background: #d875e0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 App de Desenho</h1>
+        
+        <div class="toolbar">
+            <div class="tool-group">
+                <label>Cor:</label>
+                <input type="color" id="colorPicker" value="#667eea">
+            </div>
+            
+            <div class="tool-group">
+                <label>Tamanho:</label>
+                <input type="range" id="brushSize" min="1" max="50" value="5">
+                <span id="sizeDisplay">5</span>
+            </div>
+            
+            <div class="tool-group">
+                <button onclick="setTool('brush')">✏️ Pincel</button>
+                <button onclick="setTool('eraser')">🧹 Borracha</button>
+            </div>
+            
+            <div class="tool-group">
+                <button onclick="clearCanvas()">🗑️ Limpar</button>
+                <button onclick="saveDrawing()">💾 Salvar</button>
+            </div>
+        </div>
+
+        <canvas id="canvas" width="800" height="600"></canvas>
+        
+        <div style="text-align: center;">
+            <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const brushSize = document.getElementById('brushSize');
+        const sizeDisplay = document.getElementById('sizeDisplay');
+        
+        let isDrawing = false;
+        let currentTool = 'brush';
+        let currentColor = colorPicker.value;
+        let currentSize = brushSize.value;
+
+        // Update canvas size for mobile
+        function resizeCanvas() {
+            const container = document.querySelector('.container');
+            const maxWidth = Math.min(800, container.clientWidth - 40);
+            canvas.width = maxWidth;
+            canvas.height = maxWidth * 0.75;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        brushSize.addEventListener('input', (e) => {
+            currentSize = e.target.value;
+            sizeDisplay.textContent = currentSize;
+        });
+
+        colorPicker.addEventListener('input', (e) => {
+            currentColor = e.target.value;
+        });
+
+        function setTool(tool) {
+            currentTool = tool;
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            draw(e);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+            ctx.lineWidth = currentSize;
+            ctx.lineCap = 'round';
+            
+            if (currentTool === 'brush') {
+                ctx.strokeStyle = currentColor;
+            } else {
+                ctx.strokeStyle = 'white';
+            }
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // Touch events
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startDrawing(e);
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            draw(e);
+        });
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function clearCanvas() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveDrawing() {
+            const link = document.createElement('a');
+            link.download = 'desenho.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // Initialize white background
+        clearCanvas();
+    </script>
+</body>
+</html>

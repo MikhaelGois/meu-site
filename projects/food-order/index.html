@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery de Comida</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 { margin: 0; color: #fff; }
+        
+        .cart-icon {
+            position: relative;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #f093fb;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 14px;
+        }
+        
+        .categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        .category-btn.active { background: #667eea; }
+        
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .item h3 { margin: 10px 0; }
+        .price {
+            font-size: 1.5rem;
+            color: #f093fb;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover { background: #5568d3; }
+        
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .cart-content {
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .total {
+            font-size: 2rem;
+            margin: 20px 0;
+            text-align: right;
+            color: #f093fb;
+        }
+        .back-btn {
+            background: #f093fb;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍕 Delivery Express</h1>
+            <div class="cart-icon" onclick="toggleCart()">
+                🛒
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </header>
+
+        <div class="categories">
+            <button class="category-btn active" onclick="filterCategory('all')">Todos</button>
+            <button class="category-btn" onclick="filterCategory('pizza')">🍕 Pizzas</button>
+            <button class="category-btn" onclick="filterCategory('burger')">🍔 Hambúrgueres</button>
+            <button class="category-btn" onclick="filterCategory('bebida')">🥤 Bebidas</button>
+            <button class="category-btn" onclick="filterCategory('sobremesa')">🍰 Sobremesas</button>
+        </div>
+
+        <div class="menu" id="menu"></div>
+
+        <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+    </div>
+
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <h2>Seu Pedido</h2>
+            <div id="cartItems"></div>
+            <div class="total" id="total">Total: R$ 0,00</div>
+            <button onclick="checkout()">Finalizar Pedido</button>
+            <button onclick="toggleCart()" style="background: #f093fb; margin-top: 10px;">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        const menuItems = [
+            { id: 1, name: 'Pizza Margherita', price: 45, category: 'pizza', img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=300' },
+            { id: 2, name: 'Pizza Calabresa', price: 48, category: 'pizza', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300' },
+            { id: 3, name: 'Hambúrguer Clássico', price: 35, category: 'burger', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300' },
+            { id: 4, name: 'Hambúrguer Duplo', price: 42, category: 'burger', img: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=300' },
+            { id: 5, name: 'Refrigerante Lata', price: 8, category: 'bebida', img: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=300' },
+            { id: 6, name: 'Suco Natural', price: 12, category: 'bebida', img: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=300' },
+            { id: 7, name: 'Brownie', price: 18, category: 'sobremesa', img: 'https://images.unsplash.com/photo-1590841609987-4ac211afdde1?w=300' },
+            { id: 8, name: 'Sorvete', price: 15, category: 'sobremesa', img: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300' }
+        ];
+
+        let cart = [];
+        let currentCategory = 'all';
+
+        function renderMenu() {
+            const menu = document.getElementById('menu');
+            const filtered = currentCategory === 'all' 
+                ? menuItems 
+                : menuItems.filter(item => item.category === currentCategory);
+            
+            menu.innerHTML = filtered.map(item => `
+                <div class="item">
+                    <img src="${item.img}" alt="${item.name}">
+                    <h3>${item.name}</h3>
+                    <div class="price">R$ ${item.price.toFixed(2)}</div>
+                    <button onclick="addToCart(${item.id})">Adicionar ao Carrinho</button>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderMenu();
+        }
+
+        function addToCart(id) {
+            const item = menuItems.find(i => i.id === id);
+            const existing = cart.find(i => i.id === id);
+            
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+            
+            updateCart();
+        }
+
+        function updateCart() {
+            document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            const cartItems = document.getElementById('cartItems');
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        Quantidade: ${item.quantity}
+                    </div>
+                    <div>R$ ${(item.price * item.quantity).toFixed(2)}</div>
+                </div>
+            `).join('');
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('total').textContent = `Total: R$ ${total.toFixed(2)}`;
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
+            alert('Pedido realizado com sucesso! Tempo estimado: 30-40 minutos.');
+            cart = [];
+            updateCart();
+            toggleCart();
+        }
+
+        renderMenu();
+    </script>
+</body>
+</html>

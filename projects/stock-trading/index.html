@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Ações</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            margin: 0;
+            color: #fff;
+        }
+        .portfolio-value {
+            text-align: right;
+        }
+        .portfolio-value .label {
+            opacity: 0.7;
+            font-size: 14px;
+        }
+        .portfolio-value .value {
+            font-size: 2rem;
+            color: #51cf66;
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stocks-list {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 10px;
+        }
+        .stocks-list h2 {
+            margin-bottom: 20px;
+        }
+        .stock-item {
+            display: grid;
+            grid-template-columns: 50px 1fr auto auto auto;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .stock-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .stock-icon {
+            font-size: 2rem;
+            text-align: center;
+        }
+        .stock-info h3 {
+            margin: 0 0 5px 0;
+        }
+        .stock-info small {
+            opacity: 0.7;
+        }
+        .stock-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .stock-change {
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .positive {
+            color: #51cf66;
+            background: rgba(81, 207, 102, 0.2);
+        }
+        .negative {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+        }
+        .trade-panel {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 10px;
+        }
+        .trade-panel h2 {
+            margin-bottom: 20px;
+        }
+        .trade-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input, select {
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .buy-btn {
+            background: #51cf66;
+            color: white;
+        }
+        .sell-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+        .my-stocks {
+            margin-top: 20px;
+        }
+        .my-stocks h3 {
+            margin-bottom: 15px;
+        }
+        .my-stock-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        .back-btn {
+            background: #f093fb;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Simulador de Ações</h1>
+            <div class="portfolio-value">
+                <div class="label">Valor do Portfólio</div>
+                <div class="value" id="portfolioValue">R$ 100.000,00</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="stocks-list">
+                <h2>Mercado de Ações</h2>
+                <div id="stocksList"></div>
+            </div>
+
+            <div class="trade-panel">
+                <h2>Negociar</h2>
+                <div class="trade-form">
+                    <select id="stockSelect">
+                        <option>Selecione uma ação</option>
+                    </select>
+                    <input type="number" id="quantity" placeholder="Quantidade" min="1" value="1">
+                    <button class="buy-btn" onclick="buyStock()">Comprar</button>
+                    <button class="sell-btn" onclick="sellStock()">Vender</button>
+                </div>
+
+                <div class="my-stocks">
+                    <h3>Minhas Ações</h3>
+                    <div id="myStocks"></div>
+                </div>
+            </div>
+        </div>
+
+        <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+    </div>
+
+    <script>
+        const stocks = [
+            { symbol: 'TECH', name: 'Tech Corp', price: 150.50, change: 2.5, icon: '💻' },
+            { symbol: 'SHOP', name: 'Shop Inc', price: 89.30, change: -1.2, icon: '🛍️' },
+            { symbol: 'AUTO', name: 'Auto Motors', price: 234.75, change: 3.8, icon: '🚗' },
+            { symbol: 'FOOD', name: 'Food Chain', price: 45.60, change: 1.5, icon: '🍔' },
+            { symbol: 'BANK', name: 'Big Bank', price: 178.90, change: -0.8, icon: '🏦' },
+            { symbol: 'ENRG', name: 'Energy Co', price: 67.25, change: 4.2, icon: '⚡' }
+        ];
+
+        let portfolio = { cash: 100000, stocks: {} };
+
+        function renderStocks() {
+            const container = document.getElementById('stocksList');
+            const select = document.getElementById('stockSelect');
+            
+            container.innerHTML = stocks.map(stock => `
+                <div class="stock-item" onclick="selectStock('${stock.symbol}')">
+                    <div class="stock-icon">${stock.icon}</div>
+                    <div class="stock-info">
+                        <h3>${stock.symbol}</h3>
+                        <small>${stock.name}</small>
+                    </div>
+                    <div class="stock-price">R$ ${stock.price.toFixed(2)}</div>
+                    <div class="stock-change ${stock.change >= 0 ? 'positive' : 'negative'}">
+                        ${stock.change >= 0 ? '↑' : '↓'} ${Math.abs(stock.change)}%
+                    </div>
+                </div>
+            `).join('');
+
+            select.innerHTML = '<option>Selecione uma ação</option>' + 
+                stocks.map(stock => `<option value="${stock.symbol}">${stock.symbol} - R$ ${stock.price.toFixed(2)}</option>`).join('');
+        }
+
+        function selectStock(symbol) {
+            document.getElementById('stockSelect').value = symbol;
+        }
+
+        function buyStock() {
+            const symbol = document.getElementById('stockSelect').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            if (symbol === 'Selecione uma ação') {
+                alert('Selecione uma ação!');
+                return;
+            }
+
+            const stock = stocks.find(s => s.symbol === symbol);
+            const cost = stock.price * quantity;
+
+            if (cost > portfolio.cash) {
+                alert('Saldo insuficiente!');
+                return;
+            }
+
+            portfolio.cash -= cost;
+            portfolio.stocks[symbol] = (portfolio.stocks[symbol] || 0) + quantity;
+            
+            updatePortfolio();
+            alert(`Comprado: ${quantity}x ${symbol} por R$ ${cost.toFixed(2)}`);
+        }
+
+        function sellStock() {
+            const symbol = document.getElementById('stockSelect').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            if (symbol === 'Selecione uma ação') {
+                alert('Selecione uma ação!');
+                return;
+            }
+
+            if (!portfolio.stocks[symbol] || portfolio.stocks[symbol] < quantity) {
+                alert('Você não possui ações suficientes!');
+                return;
+            }
+
+            const stock = stocks.find(s => s.symbol === symbol);
+            const value = stock.price * quantity;
+
+            portfolio.cash += value;
+            portfolio.stocks[symbol] -= quantity;
+            
+            if (portfolio.stocks[symbol] === 0) {
+                delete portfolio.stocks[symbol];
+            }
+            
+            updatePortfolio();
+            alert(`Vendido: ${quantity}x ${symbol} por R$ ${value.toFixed(2)}`);
+        }
+
+        function updatePortfolio() {
+            const stocksValue = Object.entries(portfolio.stocks).reduce((sum, [symbol, qty]) => {
+                const stock = stocks.find(s => s.symbol === symbol);
+                return sum + (stock.price * qty);
+            }, 0);
+
+            const total = portfolio.cash + stocksValue;
+            document.getElementById('portfolioValue').textContent = 
+                'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+            const myStocksDiv = document.getElementById('myStocks');
+            if (Object.keys(portfolio.stocks).length === 0) {
+                myStocksDiv.innerHTML = '<p style="opacity: 0.5;">Nenhuma ação</p>';
+            } else {
+                myStocksDiv.innerHTML = Object.entries(portfolio.stocks).map(([symbol, qty]) => {
+                    const stock = stocks.find(s => s.symbol === symbol);
+                    return `
+                        <div class="my-stock-item">
+                            <span>${stock.icon} ${symbol} x${qty}</span>
+                            <span>R$ ${(stock.price * qty).toFixed(2)}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Simulate price changes
+        setInterval(() => {
+            stocks.forEach(stock => {
+                const change = (Math.random() - 0.5) * 5;
+                stock.price = Math.max(10, stock.price + change);
+                stock.change = parseFloat((Math.random() * 10 - 5).toFixed(2));
+            });
+            renderStocks();
+            updatePortfolio();
+        }, 5000);
+
+        renderStocks();
+        updatePortfolio();
+    </script>
+</body>
+</html>

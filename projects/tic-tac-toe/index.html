@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        h1 { color: #fff; margin-bottom: 20px; }
+        .status {
+            font-size: 24px;
+            margin: 20px 0;
+            min-height: 30px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 120px);
+            gap: 10px;
+            margin: 20px auto;
+        }
+        .cell {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 10px;
+            font-size: 48px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .cell:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .cell:disabled { cursor: not-allowed; }
+        .X { color: #667eea; }
+        .O { color: #f093fb; }
+        button.reset {
+            padding: 12px 30px;
+            margin: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button.reset:hover { background: #5568d3; }
+        .back-btn {
+            background: #f093fb;
+        }
+        .back-btn:hover { background: #d875e0; }
+        .scores {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        .score-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⭕ Jogo da Velha ❌</h1>
+        <div class="scores">
+            <div class="score-item">X: <span id="scoreX">0</span></div>
+            <div class="score-item">O: <span id="scoreO">0</span></div>
+            <div class="score-item">Empates: <span id="scoreTie">0</span></div>
+        </div>
+        <div class="status" id="status">Vez do jogador X</div>
+        <div class="board" id="board"></div>
+        <button class="reset" onclick="resetGame()">Novo Jogo</button>
+        <a href="../../index.html#portfolio"><button class="reset back-btn">Voltar</button></a>
+    </div>
+
+    <script>
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let gameActive = true;
+        let scores = { X: 0, O: 0, tie: 0 };
+
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+            [0, 4, 8], [2, 4, 6] // diagonals
+        ];
+
+        function createBoard() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('button');
+                cell.className = 'cell';
+                cell.onclick = () => makeMove(i);
+                boardEl.appendChild(cell);
+            }
+        }
+
+        function makeMove(index) {
+            if (board[index] || !gameActive) return;
+
+            board[index] = currentPlayer;
+            updateDisplay();
+
+            if (checkWin()) {
+                document.getElementById('status').textContent = `🎉 Jogador ${currentPlayer} venceu!`;
+                scores[currentPlayer]++;
+                updateScores();
+                gameActive = false;
+                return;
+            }
+
+            if (board.every(cell => cell)) {
+                document.getElementById('status').textContent = '🤝 Empate!';
+                scores.tie++;
+                updateScores();
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('status').textContent = `Vez do jogador ${currentPlayer}`;
+        }
+
+        function checkWin() {
+            return winPatterns.some(pattern => {
+                return pattern.every(index => board[index] === currentPlayer);
+            });
+        }
+
+        function updateDisplay() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                cell.textContent = board[index];
+                cell.className = 'cell ' + board[index];
+                cell.disabled = !gameActive || board[index];
+            });
+        }
+
+        function updateScores() {
+            document.getElementById('scoreX').textContent = scores.X;
+            document.getElementById('scoreO').textContent = scores.O;
+            document.getElementById('scoreTie').textContent = scores.tie;
+        }
+
+        function resetGame() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            gameActive = true;
+            document.getElementById('status').textContent = 'Vez do jogador X';
+            updateDisplay();
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>

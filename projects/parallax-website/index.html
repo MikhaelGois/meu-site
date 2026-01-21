@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Parallax</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow-x: hidden;
+        }
+        .parallax {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+        }
+        .parallax::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .parallax-content {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+        }
+        .parallax-content h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s;
+        }
+        .parallax-content p {
+            font-size: 1.5rem;
+            animation: fadeInUp 1.2s;
+        }
+        .section-1 {
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .section-2 {
+            background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200');
+        }
+        .section-3 {
+            background-image: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .section-4 {
+            background-image: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200');
+        }
+        .content-section {
+            padding: 100px 50px;
+            text-align: center;
+            background: #0f0f1e;
+        }
+        .content-section h2 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+        }
+        .content-section p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background: #f093fb;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="parallax section-1">
+        <div class="parallax-content">
+            <h1>🌟 Bem-vindo</h1>
+            <p>Explore o mundo do design parallax</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <h2>Sobre Parallax</h2>
+        <p>
+            O efeito parallax cria uma ilusão de profundidade em um site, 
+            fazendo com que elementos em primeiro plano se movam mais rápido 
+            que elementos de fundo durante a rolagem. Isso resulta em uma 
+            experiência visual envolvente e moderna.
+        </p>
+    </section>
+
+    <section class="parallax section-2">
+        <div class="parallax-content">
+            <h1>🏔️ Montanhas</h1>
+            <p>Alcance novos horizontes</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <h2>Design Imersivo</h2>
+        <p>
+            Sites com parallax oferecem uma experiência única de navegação,
+            criando uma narrativa visual que guia o usuário através do conteúdo
+            de forma envolvente e memorável.
+        </p>
+    </section>
+
+    <section class="parallax section-3">
+        <div class="parallax-content">
+            <h1>🎨 Criatividade</h1>
+            <p>Transforme ideias em realidade</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <h2>Tecnologia Moderna</h2>
+        <p>
+            Usando CSS e JavaScript modernos, podemos criar efeitos visuais 
+            impressionantes que funcionam perfeitamente em todos os dispositivos,
+            proporcionando uma experiência consistente e agradável.
+        </p>
+    </section>
+
+    <section class="parallax section-4">
+        <div class="parallax-content">
+            <h1>🌲 Natureza</h1>
+            <p>Conecte-se com o mundo</p>
+        </div>
+    </section>
+
+    <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const parallaxElements = document.querySelectorAll('.parallax');
+            parallaxElements.forEach(el => {
+                const scrolled = window.pageYOffset;
+                const rate = scrolled * 0.5;
+                el.style.transform = `translate3d(0px, ${rate}px, 0px)`;
+            });
+        });
+    </script>
+</body>
+</html>

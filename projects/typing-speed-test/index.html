@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Velocidade de Digitação</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-label {
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .text-display {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            line-height: 2;
+            min-height: 150px;
+        }
+        .char {
+            transition: all 0.1s;
+        }
+        .char.correct {
+            color: #51cf66;
+        }
+        .char.incorrect {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+        }
+        .char.current {
+            border-bottom: 3px solid #667eea;
+        }
+        .input-area {
+            margin-bottom: 30px;
+        }
+        textarea {
+            width: 100%;
+            padding: 20px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.5rem;
+            resize: none;
+            font-family: inherit;
+        }
+        textarea:disabled {
+            opacity: 0.5;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            flex: 1;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .back-btn {
+            background: #f093fb;
+        }
+        .results {
+            display: none;
+            background: linear-gradient(135deg, #51cf66, #38b257);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .results h2 {
+            margin-bottom: 20px;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⌨️ Teste de Velocidade de Digitação</h1>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Tempo (s)</div>
+                <div class="stat-value" id="time">60</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">PPM</div>
+                <div class="stat-value" id="wpm">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Precisão</div>
+                <div class="stat-value" id="accuracy">100%</div>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2>🎉 Teste Concluído!</h2>
+            <div class="results-grid">
+                <div>
+                    <h3>PPM</h3>
+                    <p id="finalWpm" class="stat-value">0</p>
+                </div>
+                <div>
+                    <h3>Precisão</h3>
+                    <p id="finalAccuracy" class="stat-value">0%</p>
+                </div>
+                <div>
+                    <h3>Caracteres</h3>
+                    <p id="finalChars" class="stat-value">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-display" id="textDisplay"></div>
+
+        <div class="input-area">
+            <textarea id="inputArea" rows="4" placeholder="Clique em 'Iniciar' e comece a digitar..." disabled></textarea>
+        </div>
+
+        <div class="buttons">
+            <button onclick="startTest()" id="startBtn">Iniciar Teste</button>
+            <button onclick="resetTest()">Reiniciar</button>
+            <a href="../../index.html#portfolio" style="flex: 1;"><button class="back-btn">Voltar</button></a>
+        </div>
+    </div>
+
+    <script>
+        const texts = [
+            "A prática constante é a chave para melhorar sua velocidade de digitação. Quanto mais você pratica, mais rápido e preciso você se torna. Continue digitando!",
+            "Programadores precisam digitar rápido e com precisão. Cada caractere conta quando você está escrevendo código. Mantenha o foco e a concentração.",
+            "O teclado é uma ferramenta essencial no mundo digital. Dominar a digitação rápida pode aumentar significativamente sua produtividade diária."
+        ];
+
+        let currentText = '';
+        let currentIndex = 0;
+        let startTime = null;
+        let timerInterval = null;
+        let isTestActive = false;
+        let correctChars = 0;
+        let totalChars = 0;
+
+        function startTest() {
+            currentText = texts[Math.floor(Math.random() * texts.length)];
+            currentIndex = 0;
+            correctChars = 0;
+            totalChars = 0;
+            startTime = Date.now();
+            isTestActive = true;
+
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('inputArea').value = '';
+            document.getElementById('inputArea').disabled = false;
+            document.getElementById('inputArea').focus();
+            document.getElementById('startBtn').disabled = true;
+
+            renderText();
+            startTimer();
+        }
+
+        function resetTest() {
+            isTestActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('inputArea').disabled = true;
+            document.getElementById('inputArea').value = '';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('time').textContent = '60';
+            document.getElementById('wpm').textContent = '0';
+            document.getElementById('accuracy').textContent = '100%';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('textDisplay').innerHTML = 'Clique em "Iniciar Teste" para começar';
+        }
+
+        function renderText() {
+            const display = document.getElementById('textDisplay');
+            display.innerHTML = currentText.split('').map((char, index) => {
+                let className = 'char';
+                if (index < currentIndex) {
+                    const inputChar = document.getElementById('inputArea').value[index];
+                    className += inputChar === char ? ' correct' : ' incorrect';
+                } else if (index === currentIndex) {
+                    className += ' current';
+                }
+                return `<span class="${className}">${char === ' ' ? '&nbsp;' : char}</span>`;
+            }).join('');
+        }
+
+        function startTimer() {
+            let timeLeft = 60;
+            document.getElementById('time').textContent = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time').textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    endTest();
+                }
+            }, 1000);
+        }
+
+        function endTest() {
+            isTestActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('inputArea').disabled = true;
+            document.getElementById('startBtn').disabled = false;
+
+            const wpm = document.getElementById('wpm').textContent;
+            const accuracy = document.getElementById('accuracy').textContent;
+
+            document.getElementById('finalWpm').textContent = wpm;
+            document.getElementById('finalAccuracy').textContent = accuracy;
+            document.getElementById('finalChars').textContent = totalChars;
+            document.getElementById('results').style.display = 'block';
+        }
+
+        document.getElementById('inputArea').addEventListener('input', (e) => {
+            if (!isTestActive) return;
+
+            const input = e.target.value;
+            currentIndex = input.length;
+            totalChars = input.length;
+
+            correctChars = input.split('').filter((char, index) => 
+                char === currentText[index]
+            ).length;
+
+            const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+
+            const timeElapsed = (Date.now() - startTime) / 1000 / 60; // minutes
+            const words = correctChars / 5; // average word length
+            const wpm = Math.round(words / timeElapsed) || 0;
+            document.getElementById('wpm').textContent = wpm;
+
+            renderText();
+
+            if (input === currentText) {
+                endTest();
+            }
+        });
+
+        resetTest();
+    </script>
+</body>
+</html>

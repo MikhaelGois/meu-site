@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        .add-task {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        input {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+        button {
+            padding: 15px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: #667eea;
+        }
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .task {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .task:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .task.completed {
+            opacity: 0.6;
+        }
+        .task.completed .task-text {
+            text-decoration: line-through;
+        }
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .checkbox.checked {
+            background: #51cf66;
+            border-color: #51cf66;
+        }
+        .task-text {
+            flex: 1;
+        }
+        .delete-btn {
+            padding: 5px 15px;
+            background: #ff6b6b;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #ff5252;
+        }
+        .clear-btn {
+            width: 100%;
+            background: #f093fb;
+        }
+        .back-btn {
+            width: 100%;
+            background: #764ba2;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Lista de Tarefas</h1>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="totalTasks">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="activeTasks">0</div>
+                <div class="stat-label">Ativas</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="completedTasks">0</div>
+                <div class="stat-label">Concluídas</div>
+            </div>
+        </div>
+
+        <div class="add-task">
+            <input type="text" id="taskInput" placeholder="Adicionar nova tarefa..." onkeypress="handleKeyPress(event)">
+            <button onclick="addTask()">Adicionar</button>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterTasks('all')">Todas</button>
+            <button class="filter-btn" onclick="filterTasks('active')">Ativas</button>
+            <button class="filter-btn" onclick="filterTasks('completed')">Concluídas</button>
+        </div>
+
+        <div class="tasks-list" id="tasksList"></div>
+
+        <button class="clear-btn" onclick="clearCompleted()">Limpar Concluídas</button>
+        <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        let filter = 'all';
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            tasks.push({
+                id: Date.now(),
+                text: text,
+                completed: false,
+                createdAt: new Date().toISOString()
+            });
+
+            saveTasks();
+            renderTasks();
+            input.value = '';
+        }
+
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+        }
+
+        function filterTasks(newFilter) {
+            filter = newFilter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderTasks();
+        }
+
+        function clearCompleted() {
+            tasks = tasks.filter(t => !t.completed);
+            saveTasks();
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasksList');
+            
+            let filteredTasks = tasks;
+            if (filter === 'active') {
+                filteredTasks = tasks.filter(t => !t.completed);
+            } else if (filter === 'completed') {
+                filteredTasks = tasks.filter(t => t.completed);
+            }
+
+            container.innerHTML = filteredTasks.length === 0 
+                ? '<div style="text-align: center; opacity: 0.5; padding: 40px;">Nenhuma tarefa</div>'
+                : filteredTasks.map(task => `
+                    <div class="task ${task.completed ? 'completed' : ''}">
+                        <div class="checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})">
+                            ${task.completed ? '✓' : ''}
+                        </div>
+                        <div class="task-text">${task.text}</div>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
+                    </div>
+                `).join('');
+
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('activeTasks').textContent = tasks.filter(t => !t.completed).length;
+            document.getElementById('completedTasks').textContent = tasks.filter(t => t.completed).length;
+        }
+
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        }
+
+        renderTasks();
+    </script>
+</body>
+</html>

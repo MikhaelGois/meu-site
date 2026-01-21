@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giphy Clone</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+        button {
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .trending {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        .trend-tag {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .trend-tag:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .gifs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .gif-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s;
+        }
+        .gif-item:hover {
+            transform: scale(1.05);
+        }
+        .gif-item img {
+            width: 100%;
+            display: block;
+        }
+        .gif-placeholder {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .back-btn {
+            background: #f093fb;
+            display: block;
+            margin: 20px auto;
+        }
+        .back-btn:hover {
+            background: #d875e0;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Giphy Clone</h1>
+            <p>Busque e compartilhe GIFs</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar GIFs...">
+            <button onclick="searchGifs()">Buscar</button>
+        </div>
+
+        <div class="trending">
+            <div class="trend-tag" onclick="searchByTag('funny')">😂 Engraçado</div>
+            <div class="trend-tag" onclick="searchByTag('happy')">😊 Feliz</div>
+            <div class="trend-tag" onclick="searchByTag('love')">❤️ Amor</div>
+            <div class="trend-tag" onclick="searchByTag('dancing')">💃 Dançando</div>
+            <div class="trend-tag" onclick="searchByTag('cats')">🐱 Gatos</div>
+            <div class="trend-tag" onclick="searchByTag('reaction')">😮 Reação</div>
+        </div>
+
+        <div class="loading" id="loading">
+            <p>Carregando GIFs...</p>
+        </div>
+
+        <div class="gifs-grid" id="gifsGrid"></div>
+
+        <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+    </div>
+
+    <script>
+        const API_KEY = 'GlVGYHkr3WSBnllca54iNt0yFbjz7L65'; // Giphy public API key
+        const API_URL = 'https://api.giphy.com/v1/gifs';
+
+        async function searchGifs() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            showLoading(true);
+            
+            try {
+                const response = await fetch(
+                    `${API_URL}/search?api_key=${API_KEY}&q=${query}&limit=20&rating=g`
+                );
+                const data = await response.json();
+                displayGifs(data.data);
+            } catch (error) {
+                console.error('Error:', error);
+                displayPlaceholders();
+            }
+            
+            showLoading(false);
+        }
+
+        async function searchByTag(tag) {
+            document.getElementById('searchInput').value = tag;
+            searchGifs();
+        }
+
+        async function loadTrending() {
+            showLoading(true);
+            
+            try {
+                const response = await fetch(
+                    `${API_URL}/trending?api_key=${API_KEY}&limit=20&rating=g`
+                );
+                const data = await response.json();
+                displayGifs(data.data);
+            } catch (error) {
+                console.error('Error:', error);
+                displayPlaceholders();
+            }
+            
+            showLoading(false);
+        }
+
+        function displayGifs(gifs) {
+            const grid = document.getElementById('gifsGrid');
+            
+            if (gifs.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Nenhum GIF encontrado</p>';
+                return;
+            }
+
+            grid.innerHTML = gifs.map(gif => `
+                <div class="gif-item" onclick="copyGifUrl('${gif.images.fixed_height.url}')">
+                    <img src="${gif.images.fixed_height.url}" alt="${gif.title}">
+                </div>
+            `).join('');
+        }
+
+        function displayPlaceholders() {
+            const grid = document.getElementById('gifsGrid');
+            const placeholders = ['🎉', '😂', '❤️', '🎮', '🎨', '🎭', '🎪', '🎯', '🎲', '🎸', '🎹', '🎤'];
+            
+            grid.innerHTML = placeholders.map(emoji => `
+                <div class="gif-item">
+                    <div class="gif-placeholder">${emoji}</div>
+                </div>
+            `).join('');
+        }
+
+        function copyGifUrl(url) {
+            navigator.clipboard.writeText(url);
+            alert('URL do GIF copiado!');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchGifs();
+        });
+
+        // Load trending on start
+        loadTrending();
+    </script>
+</body>
+</html>

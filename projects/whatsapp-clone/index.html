@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .sidebar {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .search-box {
+            padding: 10px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .chats {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .chat-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .chat-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .chat-item.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            flex-shrink: 0;
+        }
+        .chat-info {
+            flex: 1;
+        }
+        .chat-name {
+            font-weight: bold;
+        }
+        .chat-preview {
+            font-size: 14px;
+            opacity: 0.7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .chat-header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 60%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            word-wrap: break-word;
+        }
+        .message.sent {
+            align-self: flex-end;
+            background: #667eea;
+        }
+        .message.received {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        .input-area {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .input-area button {
+            padding: 12px 25px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 25px;
+            background: #f093fb;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>💬 WhatsApp Clone</h2>
+            </div>
+            <div class="search-box">
+                <input type="text" placeholder="Buscar ou começar nova conversa">
+            </div>
+            <div class="chats" id="chatsList"></div>
+        </div>
+
+        <div class="main-chat">
+            <div class="chat-header">
+                <div class="chat-avatar"></div>
+                <div>
+                    <div class="chat-name" id="activeChatName">Selecione uma conversa</div>
+                    <div style="font-size: 12px; opacity: 0.7;">online</div>
+                </div>
+            </div>
+            <div class="messages" id="messages"></div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Digite uma mensagem">
+                <button onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+
+    <script>
+        const chats = [
+            { id: 1, name: 'João Silva', preview: 'Oi, tudo bem?', messages: [] },
+            { id: 2, name: 'Maria Santos', preview: 'Vamos marcar amanhã?', messages: [] },
+            { id: 3, name: 'Pedro Costa', preview: 'Obrigado!', messages: [] },
+            { id: 4, name: 'Ana Paula', preview: 'Até logo!', messages: [] }
+        ];
+
+        let activeChat = null;
+
+        function renderChatsList() {
+            const container = document.getElementById('chatsList');
+            container.innerHTML = chats.map(chat => `
+                <div class="chat-item ${activeChat === chat.id ? 'active' : ''}" onclick="selectChat(${chat.id})">
+                    <div class="chat-avatar"></div>
+                    <div class="chat-info">
+                        <div class="chat-name">${chat.name}</div>
+                        <div class="chat-preview">${chat.preview}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectChat(chatId) {
+            activeChat = chatId;
+            const chat = chats.find(c => c.id === chatId);
+            document.getElementById('activeChatName').textContent = chat.name;
+            renderChatsList();
+            renderMessages();
+        }
+
+        function renderMessages() {
+            if (!activeChat) return;
+            const chat = chats.find(c => c.id === activeChat);
+            const container = document.getElementById('messages');
+            container.innerHTML = chat.messages.map(msg => `
+                <div class="message ${msg.type}">
+                    <div>${msg.text}</div>
+                    <div class="message-time">${msg.time}</div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            if (!activeChat) return;
+            
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chat = chats.find(c => c.id === activeChat);
+            const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            chat.messages.push({ text, type: 'sent', time });
+            chat.preview = text;
+            renderMessages();
+            renderChatsList();
+            input.value = '';
+
+            // Simulate response
+            setTimeout(() => {
+                chat.messages.push({ 
+                    text: 'Mensagem recebida!', 
+                    type: 'received', 
+                    time 
+                });
+                chat.preview = 'Mensagem recebida!';
+                renderMessages();
+                renderChatsList();
+            }, 1500);
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        renderChatsList();
+    </script>
+</body>
+</html>

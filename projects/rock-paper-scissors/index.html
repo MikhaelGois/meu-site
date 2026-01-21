@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedra Papel Tesoura | Mikhael Gois</title>
+    <link rel="stylesheet" href="../shared.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>✊✋✌️ Pedra Papel Tesoura</h1>
+            <a href="../../index.html#portfolio" class="btn btn-back">← Voltar</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="game-container">
+                <div class="scoreboard">
+                    <div class="score-item">
+                        <h3>Você</h3>
+                        <div class="score" id="player-score">0</div>
+                    </div>
+                    <div class="score-item">
+                        <h3>Computador</h3>
+                        <div class="score" id="computer-score">0</div>
+                    </div>
+                </div>
+
+                <div class="choices">
+                    <div class="choice-item">
+                        <div class="choice-display" id="player-choice">❓</div>
+                        <p>Você</p>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="choice-item">
+                        <div class="choice-display" id="computer-choice">❓</div>
+                        <p>Computador</p>
+                    </div>
+                </div>
+
+                <div class="result" id="result">Escolha sua jogada!</div>
+
+                <div class="buttons">
+                    <button class="choice-btn" onclick="play('rock')">
+                        <span class="icon">✊</span>
+                        <span>Pedra</span>
+                    </button>
+                    <button class="choice-btn" onclick="play('paper')">
+                        <span class="icon">✋</span>
+                        <span>Papel</span>
+                    </button>
+                    <button class="choice-btn" onclick="play('scissors')">
+                        <span class="icon">✌️</span>
+                        <span>Tesoura</span>
+                    </button>
+                </div>
+
+                <button class="btn btn-secondary" onclick="resetGame()" style="margin-top: 1rem;">Resetar Placar</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Mikhael Gois | Jogo Clássico</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

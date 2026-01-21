@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Clone</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .compose {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .tweet {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .username {
+            font-weight: bold;
+        }
+        .handle {
+            opacity: 0.6;
+        }
+        .tweet-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .action {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .action:hover {
+            opacity: 1;
+        }
+        .back-btn {
+            background: #f093fb;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐦 Twitter Clone</h1>
+        </div>
+
+        <div class="compose">
+            <textarea id="tweetInput" placeholder="O que está acontecendo?"></textarea>
+            <button onclick="postTweet()">Tweetar</button>
+        </div>
+
+        <div id="feed"></div>
+
+        <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+    </div>
+
+    <script>
+        let tweets = JSON.parse(localStorage.getItem('tweets') || '[]');
+
+        function renderFeed() {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = tweets.map((tweet, index) => `
+                <div class="tweet">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <div class="username">${tweet.username}</div>
+                            <div class="handle">@${tweet.handle} · ${tweet.time}</div>
+                        </div>
+                    </div>
+                    <div>${tweet.text}</div>
+                    <div class="tweet-actions">
+                        <span class="action" onclick="likeTweet(${index})">❤️ ${tweet.likes || 0}</span>
+                        <span class="action">💬 ${tweet.replies || 0}</span>
+                        <span class="action">🔄 ${tweet.retweets || 0}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function postTweet() {
+            const input = document.getElementById('tweetInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            tweets.unshift({
+                username: 'Você',
+                handle: 'voce',
+                text: text,
+                time: time,
+                likes: 0,
+                replies: 0,
+                retweets: 0
+            });
+
+            localStorage.setItem('tweets', JSON.stringify(tweets));
+            renderFeed();
+            input.value = '';
+        }
+
+        function likeTweet(index) {
+            tweets[index].likes = (tweets[index].likes || 0) + 1;
+            localStorage.setItem('tweets', JSON.stringify(tweets));
+            renderFeed();
+        }
+
+        renderFeed();
+    </script>
+</body>
+</html>

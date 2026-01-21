@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitor de QR Code</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 { margin-bottom: 20px; color: #fff; }
+        #video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        #result {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 255, 0, 0.1);
+            border-radius: 8px;
+            word-break: break-all;
+            display: none;
+        }
+        .btn {
+            padding: 12px 30px;
+            margin: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover { background: #5568d3; }
+        .back-btn {
+            background: #f093fb;
+        }
+        .back-btn:hover { background: #d875e0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Leitor de QR Code</h1>
+        <button class="btn" id="startBtn">Iniciar Câmera</button>
+        <video id="video" autoplay></video>
+        <div id="result"></div>
+        <canvas id="canvas" style="display: none;"></canvas>
+        <a href="../../index.html#portfolio"><button class="btn back-btn">Voltar</button></a>
+    </div>
+
+    <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const result = document.getElementById('result');
+        const startBtn = document.getElementById('startBtn');
+        const ctx = canvas.getContext('2d');
+        let scanning = false;
+
+        startBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                startBtn.style.display = 'none';
+                scanning = true;
+                requestAnimationFrame(scan);
+            } catch (err) {
+                alert('Erro ao acessar câmera: ' + err.message);
+            }
+        });
+
+        function scan() {
+            if (!scanning) return;
+            
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code) {
+                    result.style.display = 'block';
+                    result.innerHTML = `<strong>QR Code detectado:</strong><br>${code.data}`;
+                    if (code.data.startsWith('http')) {
+                        result.innerHTML += `<br><a href="${code.data}" target="_blank" style="color: #667eea;">Abrir Link</a>`;
+                    }
+                }
+            }
+            
+            requestAnimationFrame(scan);
+        }
+    </script>
+</body>
+</html>

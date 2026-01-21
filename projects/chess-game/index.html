@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Xadrez</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0;
+            aspect-ratio: 1;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .square {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .square.light {
+            background: #e8e8e8;
+            color: #000;
+        }
+        .square.dark {
+            background: #769656;
+            color: #000;
+        }
+        .square.selected {
+            background: #baca44 !important;
+        }
+        .square.possible-move {
+            position: relative;
+        }
+        .square.possible-move::after {
+            content: '';
+            position: absolute;
+            width: 30%;
+            height: 30%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .back-btn {
+            background: #f093fb;
+        }
+        .captured {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>♟️ Xadrez</h1>
+        
+        <div class="game-info">
+            <div>
+                <div><strong>Vez:</strong> <span id="turn">Brancas</span></div>
+                <div class="captured" id="capturedWhite"></div>
+            </div>
+            <div style="text-align: right;">
+                <div><strong>Movimentos:</strong> <span id="moves">0</span></div>
+                <div class="captured" id="capturedBlack"></div>
+            </div>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <div class="buttons">
+            <button onclick="resetGame()">Novo Jogo</button>
+            <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+        </div>
+    </div>
+
+    <script>
+        const pieces = {
+            'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+        };
+
+        let board = [
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+        ];
+
+        let selectedSquare = null;
+        let currentTurn = 'white';
+        let moveCount = 0;
+
+        function createBoard() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
+                    square.dataset.row = row;
+                    square.dataset.col = col;
+                    square.textContent = pieces[board[row][col]] || '';
+                    square.onclick = () => handleSquareClick(row, col);
+                    boardEl.appendChild(square);
+                }
+            }
+        }
+
+        function handleSquareClick(row, col) {
+            const piece = board[row][col];
+            
+            if (selectedSquare) {
+                // Try to move
+                if (isValidMove(selectedSquare.row, selectedSquare.col, row, col)) {
+                    movePiece(selectedSquare.row, selectedSquare.col, row, col);
+                    selectedSquare = null;
+                    clearHighlights();
+                    createBoard();
+                } else {
+                    selectedSquare = null;
+                    clearHighlights();
+                    createBoard();
+                }
+            } else if (piece && isCurrentPlayerPiece(piece)) {
+                // Select piece
+                selectedSquare = { row, col };
+                highlightSquare(row, col);
+                highlightPossibleMoves(row, col);
+            }
+        }
+
+        function isCurrentPlayerPiece(piece) {
+            if (currentTurn === 'white') {
+                return piece === piece.toUpperCase();
+            } else {
+                return piece === piece.toLowerCase();
+            }
+        }
+
+        function isValidMove(fromRow, fromCol, toRow, toCol) {
+            const piece = board[fromRow][fromCol];
+            const target = board[toRow][toCol];
+            
+            // Can't capture own piece
+            if (target && isCurrentPlayerPiece(target)) {
+                return false;
+            }
+
+            // Basic movement validation (simplified)
+            const rowDiff = Math.abs(toRow - fromRow);
+            const colDiff = Math.abs(toCol - fromCol);
+            
+            // Pawns
+            if (piece.toLowerCase() === 'p') {
+                const direction = piece === 'P' ? -1 : 1;
+                if (toCol === fromCol && !target) {
+                    return toRow === fromRow + direction;
+                }
+            }
+            
+            // Knights
+            if (piece.toLowerCase() === 'n') {
+                return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+            }
+
+            // Bishops
+            if (piece.toLowerCase() === 'b') {
+                return rowDiff === colDiff;
+            }
+
+            // Rooks
+            if (piece.toLowerCase() === 'r') {
+                return fromRow === toRow || fromCol === toCol;
+            }
+
+            // Queens
+            if (piece.toLowerCase() === 'q') {
+                return fromRow === toRow || fromCol === toCol || rowDiff === colDiff;
+            }
+
+            // Kings
+            if (piece.toLowerCase() === 'k') {
+                return rowDiff <= 1 && colDiff <= 1;
+            }
+
+            return false;
+        }
+
+        function movePiece(fromRow, fromCol, toRow, toCol) {
+            board[toRow][toCol] = board[fromRow][fromCol];
+            board[fromRow][fromCol] = '';
+            
+            currentTurn = currentTurn === 'white' ? 'black' : 'white';
+            moveCount++;
+            
+            document.getElementById('turn').textContent = currentTurn === 'white' ? 'Brancas' : 'Pretas';
+            document.getElementById('moves').textContent = moveCount;
+        }
+
+        function highlightSquare(row, col) {
+            const squares = document.querySelectorAll('.square');
+            const index = row * 8 + col;
+            squares[index].classList.add('selected');
+        }
+
+        function highlightPossibleMoves(row, col) {
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (isValidMove(row, col, r, c)) {
+                        const squares = document.querySelectorAll('.square');
+                        const index = r * 8 + c;
+                        squares[index].classList.add('possible-move');
+                    }
+                }
+            }
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.square').forEach(sq => {
+                sq.classList.remove('selected', 'possible-move');
+            });
+        }
+
+        function resetGame() {
+            board = [
+                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+            ];
+            selectedSquare = null;
+            currentTurn = 'white';
+            moveCount = 0;
+            document.getElementById('turn').textContent = 'Brancas';
+            document.getElementById('moves').textContent = '0';
+            createBoard();
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>

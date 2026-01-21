@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .album-art {
+            width: 100%;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            margin-bottom: 30px;
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .song-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .song-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .artist {
+            opacity: 0.7;
+            font-size: 1.2rem;
+        }
+        .progress-container {
+            margin: 30px 0;
+        }
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            opacity: 0.7;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        .control-btn.play {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            font-size: 2rem;
+        }
+        .playlist {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .playlist-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .playlist-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .playlist-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .playlist-icon {
+            font-size: 2rem;
+        }
+        .back-btn {
+            width: 100%;
+            padding: 15px;
+            background: #f093fb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Music Player</h1>
+
+        <div class="album-art" id="albumArt">🎧</div>
+
+        <div class="song-info">
+            <div class="song-title" id="songTitle">Summer Vibes</div>
+            <div class="artist" id="artist">The Wave Makers</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" onclick="seekTo(event)">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">3:45</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="previousSong()">⏮️</button>
+            <button class="control-btn play" onclick="togglePlay()" id="playBtn">▶️</button>
+            <button class="control-btn" onclick="nextSong()">⏭️</button>
+        </div>
+
+        <div class="playlist" id="playlist"></div>
+
+        <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+    </div>
+
+    <script>
+        const songs = [
+            { title: 'Summer Vibes', artist: 'The Wave Makers', duration: 225, icon: '🌊' },
+            { title: 'Neon Lights', artist: 'Electric Dreams', duration: 198, icon: '✨' },
+            { title: 'Midnight Drive', artist: 'Retro Wave', duration: 243, icon: '🚗' },
+            { title: 'Coffee Shop Jazz', artist: 'Smooth Beats', duration: 210, icon: '☕' },
+            { title: 'Workout Pump', artist: 'Energy Boost', duration: 186, icon: '💪' }
+        ];
+
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        let currentTime = 0;
+        let intervalId = null;
+
+        function renderPlaylist() {
+            const playlist = document.getElementById('playlist');
+            playlist.innerHTML = songs.map((song, index) => `
+                <div class="playlist-item ${index === currentSongIndex ? 'active' : ''}" onclick="playSong(${index})">
+                    <div class="playlist-icon">${song.icon}</div>
+                    <div style="flex: 1;">
+                        <div><strong>${song.title}</strong></div>
+                        <div style="opacity: 0.7; font-size: 14px;">${song.artist}</div>
+                    </div>
+                    <div>${formatTime(song.duration)}</div>
+                </div>
+            `).join('');
+        }
+
+        function playSong(index) {
+            currentSongIndex = index;
+            const song = songs[index];
+            
+            document.getElementById('songTitle').textContent = song.title;
+            document.getElementById('artist').textContent = song.artist;
+            document.getElementById('albumArt').textContent = song.icon;
+            document.getElementById('duration').textContent = formatTime(song.duration);
+            
+            currentTime = 0;
+            updateProgress();
+            renderPlaylist();
+            
+            if (isPlaying) {
+                play();
+            }
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            document.getElementById('playBtn').textContent = isPlaying ? '⏸️' : '▶️';
+            
+            if (isPlaying) {
+                play();
+            } else {
+                pause();
+            }
+        }
+
+        function play() {
+            intervalId = setInterval(() => {
+                currentTime++;
+                updateProgress();
+                
+                if (currentTime >= songs[currentSongIndex].duration) {
+                    nextSong();
+                }
+            }, 1000);
+        }
+
+        function pause() {
+            clearInterval(intervalId);
+        }
+
+        function previousSong() {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            playSong(currentSongIndex);
+        }
+
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            playSong(currentSongIndex);
+        }
+
+        function seekTo(event) {
+            const bar = event.currentTarget;
+            const rect = bar.getBoundingClientRect();
+            const percent = (event.clientX - rect.left) / rect.width;
+            currentTime = Math.floor(percent * songs[currentSongIndex].duration);
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const percent = (currentTime / songs[currentSongIndex].duration) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('currentTime').textContent = formatTime(currentTime);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        renderPlaylist();
+    </script>
+</body>
+</html>

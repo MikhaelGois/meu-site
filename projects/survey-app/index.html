@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criador de Enquetes</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .survey-form {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .options {
+            margin: 20px 0;
+        }
+        .option-input {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .survey {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .survey-option {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .survey-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-bar {
+            height: 30px;
+            background: #667eea;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+        .back-btn {
+            background: #f093fb;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Criador de Enquetes</h1>
+
+        <div class="survey-form">
+            <h2>Criar Nova Enquete</h2>
+            <input type="text" id="questionInput" placeholder="Digite sua pergunta...">
+            <div class="options" id="optionsContainer">
+                <div class="option-input">
+                    <input type="text" class="option" placeholder="Opção 1">
+                </div>
+                <div class="option-input">
+                    <input type="text" class="option" placeholder="Opção 2">
+                </div>
+            </div>
+            <button onclick="addOption()">+ Adicionar Opção</button>
+            <button onclick="createSurvey()">Criar Enquete</button>
+        </div>
+
+        <div id="surveys"></div>
+
+        <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+    </div>
+
+    <script>
+        let surveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+
+        function addOption() {
+            const container = document.getElementById('optionsContainer');
+            const count = container.children.length + 1;
+            const div = document.createElement('div');
+            div.className = 'option-input';
+            div.innerHTML = `<input type="text" class="option" placeholder="Opção ${count}">`;
+            container.appendChild(div);
+        }
+
+        function createSurvey() {
+            const question = document.getElementById('questionInput').value.trim();
+            const options = Array.from(document.querySelectorAll('.option'))
+                .map(input => input.value.trim())
+                .filter(val => val);
+
+            if (!question || options.length < 2) {
+                alert('Digite uma pergunta e pelo menos 2 opções!');
+                return;
+            }
+
+            surveys.push({
+                id: Date.now(),
+                question,
+                options: options.map(text => ({ text, votes: 0 })),
+                totalVotes: 0
+            });
+
+            localStorage.setItem('surveys', JSON.stringify(surveys));
+            renderSurveys();
+            
+            document.getElementById('questionInput').value = '';
+            document.querySelectorAll('.option').forEach(input => input.value = '');
+        }
+
+        function vote(surveyId, optionIndex) {
+            const survey = surveys.find(s => s.id === surveyId);
+            if (localStorage.getItem(`voted_${surveyId}`)) {
+                alert('Você já votou nesta enquete!');
+                return;
+            }
+
+            survey.options[optionIndex].votes++;
+            survey.totalVotes++;
+            localStorage.setItem('surveys', JSON.stringify(surveys));
+            localStorage.setItem(`voted_${surveyId}`, 'true');
+            renderSurveys();
+        }
+
+        function renderSurveys() {
+            const container = document.getElementById('surveys');
+            container.innerHTML = surveys.map(survey => {
+                const hasVoted = localStorage.getItem(`voted_${survey.id}`);
+                
+                return `
+                    <div class="survey">
+                        <h3>${survey.question}</h3>
+                        <p>Total de votos: ${survey.totalVotes}</p>
+                        ${hasVoted ? `
+                            <div class="results">
+                                ${survey.options.map(opt => {
+                                    const percentage = survey.totalVotes > 0 
+                                        ? Math.round((opt.votes / survey.totalVotes) * 100) 
+                                        : 0;
+                                    return `
+                                        <div>
+                                            <div>${opt.text}</div>
+                                            <div class="result-bar" style="width: ${percentage}%">
+                                                ${percentage}% (${opt.votes} votos)
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : `
+                            ${survey.options.map((opt, index) => `
+                                <div class="survey-option" onclick="vote(${survey.id}, ${index})">
+                                    ${opt.text}
+                                </div>
+                            `).join('')}
+                        `}
+                    </div>
+                `;
+            }).reverse().join('');
+        }
+
+        renderSurveys();
+    </script>
+</body>
+</html>

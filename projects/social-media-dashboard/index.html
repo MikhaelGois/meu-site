@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Redes Sociais</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .stat-icon {
+            font-size: 3rem;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+        .instagram { background: linear-gradient(45deg, #f093fb, #f5576c); }
+        .twitter { background: #1DA1F2; }
+        .facebook { background: #1877F2; }
+        .youtube { background: #FF0000; }
+        .linkedin { background: #0077B5; }
+        .tiktok { background: linear-gradient(45deg, #00f2ea, #ff0050); }
+        .stat-info h3 {
+            margin: 0 0 5px 0;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .stat-change {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .positive {
+            color: #51cf66;
+        }
+        .negative {
+            color: #ff6b6b;
+        }
+        .charts {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        .chart-card h2 {
+            margin-bottom: 20px;
+        }
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 200px;
+        }
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .bar:hover {
+            opacity: 0.8;
+        }
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+        }
+        .engagement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .engagement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .back-btn {
+            background: #f093fb;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Dashboard de Redes Sociais</h1>
+            <p>Análise de desempenho em tempo real</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon instagram">📷</div>
+                <div class="stat-info">
+                    <h3>Instagram</h3>
+                    <div class="stat-value">45.2K</div>
+                    <div class="stat-change positive">↑ 12% esta semana</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon twitter">🐦</div>
+                <div class="stat-info">
+                    <h3>Twitter</h3>
+                    <div class="stat-value">28.5K</div>
+                    <div class="stat-change positive">↑ 8% esta semana</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon facebook">👍</div>
+                <div class="stat-info">
+                    <h3>Facebook</h3>
+                    <div class="stat-value">67.8K</div>
+                    <div class="stat-change negative">↓ 3% esta semana</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon youtube">▶️</div>
+                <div class="stat-info">
+                    <h3>YouTube</h3>
+                    <div class="stat-value">123K</div>
+                    <div class="stat-change positive">↑ 25% esta semana</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon linkedin">💼</div>
+                <div class="stat-info">
+                    <h3>LinkedIn</h3>
+                    <div class="stat-value">15.3K</div>
+                    <div class="stat-change positive">↑ 6% esta semana</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon tiktok">🎵</div>
+                <div class="stat-info">
+                    <h3>TikTok</h3>
+                    <div class="stat-value">89.4K</div>
+                    <div class="stat-change positive">↑ 45% esta semana</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts">
+            <div class="chart-card">
+                <h2>Engajamento Semanal</h2>
+                <div class="bar-chart">
+                    <div class="bar" style="height: 60%">
+                        <div class="bar-label">Seg</div>
+                    </div>
+                    <div class="bar" style="height: 75%">
+                        <div class="bar-label">Ter</div>
+                    </div>
+                    <div class="bar" style="height: 85%">
+                        <div class="bar-label">Qua</div>
+                    </div>
+                    <div class="bar" style="height: 70%">
+                        <div class="bar-label">Qui</div>
+                    </div>
+                    <div class="bar" style="height: 95%">
+                        <div class="bar-label">Sex</div>
+                    </div>
+                    <div class="bar" style="height: 65%">
+                        <div class="bar-label">Sáb</div>
+                    </div>
+                    <div class="bar" style="height: 55%">
+                        <div class="bar-label">Dom</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h2>Top Posts</h2>
+                <div class="engagement-list">
+                    <div class="engagement-item">
+                        <span>Post sobre IA</span>
+                        <span class="positive">15.2K</span>
+                    </div>
+                    <div class="engagement-item">
+                        <span>Tutorial React</span>
+                        <span class="positive">12.8K</span>
+                    </div>
+                    <div class="engagement-item">
+                        <span>Dicas de Design</span>
+                        <span class="positive">10.5K</span>
+                    </div>
+                    <div class="engagement-item">
+                        <span>Review Produto</span>
+                        <span class="positive">9.2K</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+    </div>
+</body>
+</html>

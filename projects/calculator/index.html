@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora | Mikhael Gois</title>
+    <link rel="stylesheet" href="../shared.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🧮 Calculadora</h1>
+            <a href="../../index.html#portfolio" class="btn btn-back">← Voltar</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="calculator">
+                <div class="display" id="display">0</div>
+                <div class="buttons">
+                    <button class="btn-func" onclick="clearDisplay()">C</button>
+                    <button class="btn-func" onclick="deleteLast()">⌫</button>
+                    <button class="btn-func" onclick="appendOperator('%')">%</button>
+                    <button class="btn-operator" onclick="appendOperator('/')">÷</button>
+                    
+                    <button onclick="appendNumber('7')">7</button>
+                    <button onclick="appendNumber('8')">8</button>
+                    <button onclick="appendNumber('9')">9</button>
+                    <button class="btn-operator" onclick="appendOperator('*')">×</button>
+                    
+                    <button onclick="appendNumber('4')">4</button>
+                    <button onclick="appendNumber('5')">5</button>
+                    <button onclick="appendNumber('6')">6</button>
+                    <button class="btn-operator" onclick="appendOperator('-')">−</button>
+                    
+                    <button onclick="appendNumber('1')">1</button>
+                    <button onclick="appendNumber('2')">2</button>
+                    <button onclick="appendNumber('3')">3</button>
+                    <button class="btn-operator" onclick="appendOperator('+')">+</button>
+                    
+                    <button class="span-2" onclick="appendNumber('0')">0</button>
+                    <button onclick="appendNumber('.')">.</button>
+                    <button class="btn-equals" onclick="calculate()">=</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Mikhael Gois | Calculadora Simples</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

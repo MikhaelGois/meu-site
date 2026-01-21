@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Clone</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow-x: hidden;
+        }
+        .header {
+            padding: 20px 50px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #E50914;
+        }
+        .hero {
+            height: 80vh;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding: 0 50px;
+        }
+        .hero-content {
+            max-width: 600px;
+        }
+        .hero-content h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .hero-content p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-play {
+            background: white;
+            color: black;
+        }
+        .btn-info {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        .section {
+            padding: 50px;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .movies-row {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+        .movie-card {
+            min-width: 250px;
+            height: 140px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        .movie-card:hover {
+            transform: scale(1.1);
+        }
+        .category-1 .movie-card { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .category-2 .movie-card { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .category-3 .movie-card { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background: #E50914;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">NETFLIX</div>
+        <div>Início | Séries | Filmes | Minha Lista</div>
+    </div>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Stranger Things</h1>
+            <p>Quando um garoto desaparece, uma pequena cidade descobre um mistério envolvendo experimentos secretos, forças sobrenaturais e uma garota muito especial.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-play">▶️ Assistir</button>
+                <button class="btn btn-info">ℹ️ Mais informações</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section category-1">
+        <h2 class="section-title">Populares na Netflix</h2>
+        <div class="movies-row">
+            <div class="movie-card">🎬</div>
+            <div class="movie-card">🎭</div>
+            <div class="movie-card">🎪</div>
+            <div class="movie-card">🎨</div>
+            <div class="movie-card">🎯</div>
+            <div class="movie-card">🎮</div>
+        </div>
+    </div>
+
+    <div class="section category-2">
+        <h2 class="section-title">Séries de Ação</h2>
+        <div class="movies-row">
+            <div class="movie-card">💥</div>
+            <div class="movie-card">⚔️</div>
+            <div class="movie-card">🔫</div>
+            <div class="movie-card">🥊</div>
+            <div class="movie-card">🏹</div>
+            <div class="movie-card">🎯</div>
+        </div>
+    </div>
+
+    <div class="section category-3">
+        <h2 class="section-title">Documentários</h2>
+        <div class="movies-row">
+            <div class="movie-card">🌍</div>
+            <div class="movie-card">🦁</div>
+            <div class="movie-card">🌊</div>
+            <div class="movie-card">🗻</div>
+            <div class="movie-card">🔬</div>
+            <div class="movie-card">🎓</div>
+        </div>
+    </div>
+
+    <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+</body>
+</html>

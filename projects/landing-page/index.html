@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+        .hero {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s;
+        }
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            animation: fadeInUp 1.2s;
+        }
+        .cta-button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            animation: fadeInUp 1.4s;
+        }
+        .cta-button:hover { transform: scale(1.05); }
+        .features {
+            background: #0f0f1e;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+        }
+        .feature {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            transition: transform 0.3s;
+        }
+        .feature:hover { transform: translateY(-10px); }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .about {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            text-align: center;
+        }
+        .about-content {
+            max-width: 800px;
+        }
+        .about h2 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+        }
+        .about p {
+            font-size: 1.3rem;
+            line-height: 1.8;
+        }
+        .contact {
+            background: #1a1a2e;
+            text-align: center;
+        }
+        .contact form {
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .contact input, .contact textarea {
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        .contact button {
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background: #f093fb;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div>
+            <h1>🚀 Bem-vindo ao Futuro</h1>
+            <p>Soluções digitais que transformam seu negócio</p>
+            <button class="cta-button" onclick="document.querySelector('.contact').scrollIntoView({behavior: 'smooth'})">
+                Comece Agora
+            </button>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Rápido</h3>
+                <p>Performance otimizada para velocidade máxima</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <h3>Design Moderno</h3>
+                <p>Interface intuitiva e atraente</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <h3>Seguro</h3>
+                <p>Proteção de dados de ponta</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <h3>Responsivo</h3>
+                <p>Funciona em todos os dispositivos</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about">
+        <div class="about-content">
+            <h2>Sobre Nós</h2>
+            <p>
+                Somos uma equipe dedicada a criar experiências digitais incríveis.
+                Com anos de experiência no mercado, transformamos ideias em realidade
+                através de tecnologia de ponta e design inovador.
+            </p>
+        </div>
+    </section>
+
+    <section class="contact">
+        <div>
+            <h2>Entre em Contato</h2>
+            <form onsubmit="handleSubmit(event)">
+                <input type="text" placeholder="Seu Nome" required>
+                <input type="email" placeholder="Seu Email" required>
+                <textarea placeholder="Sua Mensagem" rows="5" required></textarea>
+                <button type="submit">Enviar Mensagem</button>
+            </form>
+        </div>
+    </section>
+
+    <a href="../../index.html#portfolio"><button class="back-btn">Voltar</button></a>
+
+    <script>
+        function handleSubmit(e) {
+            e.preventDefault();
+            alert('Mensagem enviada com sucesso!');
+            e.target.reset();
+        }
+    </script>
+</body>
+</html>

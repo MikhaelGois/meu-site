@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Galeria de Projetos</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial; background: #0b1220; color:#e6eef8; margin:0; padding:1.25rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+    .card{background:rgba(255,255,255,0.03);padding:12px;border-radius:8px;text-align:center}
+    .card a{color:inherit;text-decoration:none}
+    .card .icon{font-size:28px}
+    .header{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1rem}
+    .close-btn{background:#efefef;color:#111;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+    .note{color:#aab6c8;font-size:0.95rem}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h2 style="margin:0">Galeria de Projetos</h2>
+      <div class="note">Clique em um projeto para abrir a demo nesta mesma janela (iframe).</div>
+    </div>
+    <div>
+      <button class="close-btn" onclick="parent.closeProjectModal()">Fechar</button>
+    </div>
+  </div>
+
+  <div id="projectsGrid" class="grid"></div>
+
+  <script>
+    // Build gallery from parent window's projectsList to avoid duplication
+    (function(){
+      const grid = document.getElementById('projectsGrid');
+      try{
+        const projects = (window.parent && window.parent.projectsList) ? window.parent.projectsList : [];
+        if(!projects.length){
+          grid.innerHTML = '<p>Nenhum projeto encontrado.</p>';
+          return;
+        }
+        projects.forEach(p=>{
+          const card = document.createElement('div');
+          card.className = 'card';
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.style = 'background:none;border:none;color:inherit;text-align:left;width:100%;cursor:pointer;padding:0';
+          btn.innerHTML = `<div class="icon">${p.icon}</div><div class="title">${p.name}</div><div class="desc" style="font-size:0.9rem;color:#9fb0c9;margin-top:6px">Abrir demo</div>`;
+          btn.addEventListener('click', function(e){
+            try{
+              if(window.parent && typeof window.parent.switchProject === 'function'){
+                // ask parent to load the project into the iframe
+                window.parent.switchProject(p.folder);
+              } else {
+                // fallback: navigate within iframe
+                window.location.href = './' + p.folder + '/';
+              }
+            }catch(err){ window.location.href = './' + p.folder + '/'; }
+          });
+          card.appendChild(btn);
+          grid.appendChild(card);
+        });
+      }catch(e){
+        grid.innerHTML = '<p>Erro ao construir galeria.</p>';
+      }
+    })();
+  </script>
+</body>
+</html>
